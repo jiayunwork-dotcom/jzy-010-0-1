@@ -1,0 +1,53 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: decay-chain-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://db:5432/decay}
+    username: ${DB_USERNAME:decay}
+    password: ${DB_PASSWORD:decay}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 2
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  threads:
+    virtual:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+
+decay:
+  # 链长度允许范围 [2, 12]
+  max-chain-length: 12
+  # 相邻衰变常数相对差小于该值即按重根极限处理（避免除零/数值爆炸）
+  near-equal-rel-tol: 1.0e-8
+  # 均匀网格步数、显式时刻数、批量组数上限
+  max-grid-steps: 10000
+  max-time-points: 10000
+  max-batch-items: 200
+  # 原子守恒校验相对容差
+  conservation-rel-tol: 1.0e-6
+
+logging:
+  level:
+    com.example.decay: INFO
